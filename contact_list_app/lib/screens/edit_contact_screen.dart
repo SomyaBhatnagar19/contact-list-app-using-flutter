@@ -15,12 +15,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
   final ApiService apiService = ApiService();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
+  late TextEditingController _emailAddressController;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.contact.name);
     _phoneController = TextEditingController(text: widget.contact.phone);
+    _emailAddressController = TextEditingController(text: widget.contact.email);
   }
 
   Future<void> _saveContact() async {
@@ -28,8 +30,9 @@ class _EditContactScreenState extends State<EditContactScreen> {
       id: widget.contact.id,
       name: _nameController.text,
       phone: _phoneController.text,
+      email: _emailAddressController.text,
     );
-    await apiService.updateContact(updatedContact);
+    await apiService.updateContact(widget.contact.id, updatedContact);
     Navigator.pop(context, updatedContact);
   }
 
@@ -49,6 +52,11 @@ class _EditContactScreenState extends State<EditContactScreen> {
               controller: _phoneController,
               decoration: InputDecoration(labelText: 'Phone'),
               keyboardType: TextInputType.phone,
+            ),
+            TextField(
+              controller: _emailAddressController,
+              decoration: InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
             ),
             SizedBox(height: 20),
             ElevatedButton(

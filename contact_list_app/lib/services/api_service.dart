@@ -36,11 +36,11 @@ class ApiService {
   }
 
   // for updating
-Future<void> updateContact(Contact contact) async {
-  await http.put(
-    Uri.parse('$apiUrl/contacts/${contact.id}/'),
-    headers: {"Content-Type": "application/json"},
-    body: json.encode(contact.toJson()),
-  );
-}
+  Future<void> updateContact(int id, Contact contact) async {
+    await http.put(
+      Uri.parse('$apiUrl$id/'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(contact.toJson()),
+    );
+  }
 }
