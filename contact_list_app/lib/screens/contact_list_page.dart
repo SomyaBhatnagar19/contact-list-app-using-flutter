@@ -14,19 +14,31 @@ class _ContactListPageState extends State<ContactListPage> {
   final ApiService apiService = ApiService();
   final TextEditingController _searchController = TextEditingController();
   late Future<List<Contact>> contactList;
+  // State variable for search query
+  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    contactList = apiService.fetchContacts();
+    contactList = apiService.fetchContacts();  // Initial fetch of all contacts
   }
 
+  // Refreshes the contact list based on the search query
   void _refreshContacts() {
     setState(() {
-      contactList = apiService.fetchContacts();
+      contactList = apiService.fetchContacts(query: searchQuery); // Fetch filtered contacts
     });
   }
 
+  // Called when the search query changes
+  void _onSearchChanged(String query) {
+    setState(() {
+      searchQuery = query;  // Update the search query state
+      _refreshContacts();  // Refresh the contacts based on the search query
+    });
+  }
+
+  // Navigates to the Add Contact screen and refreshes after contact is added
   Future<void> _navigateToAddContact() async {
     final newContact = await Navigator.push(
       context,
@@ -61,15 +73,17 @@ class _ContactListPageState extends State<ContactListPage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
-                      fillColor: const Color.fromARGB(255, 11, 0, 0),
+                      fillColor: const Color.fromARGB(255, 245, 245, 245),
                       contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                     ),
+                    onChanged: _onSearchChanged,  // Trigger search functionality
                   ),
                 ),
                 IconButton(
                   icon: Icon(Icons.search),
                   color: const Color.fromARGB(255, 90, 89, 89),
                   onPressed: () {
+                    _onSearchChanged(_searchController.text);  // Trigger search when button is pressed
                     print('Search for: ${_searchController.text}');
                   },
                 ),
@@ -87,14 +101,14 @@ class _ContactListPageState extends State<ContactListPage> {
         ],
       ),
       body: FutureBuilder<List<Contact>>(
-        future: contactList,
+        future: contactList,  // Use the contact list which can change based on the search query
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator()); // Loading indicator
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}')); // Error handling
           } else {
-            final contacts = snapshot.data!;
+            final contacts = snapshot.data!;  // Get contacts from the snapshot
             return ListView.builder(
               itemCount: contacts.length,
               itemBuilder: (context, index) {

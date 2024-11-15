@@ -5,12 +5,17 @@ import '../models/contact.dart';
 class ApiService {
   static const String apiUrl = 'http://127.0.0.1:8000/api/contacts/';
 
-  Future<List<Contact>> fetchContacts() async {
-    final response = await http.get(Uri.parse(apiUrl));
+  Future<List<Contact>> fetchContacts({String query = ''}) async {
+    //Modifying for searching functionality
+    //changing the url for it
+    final response = await http.get(Uri.parse('$apiUrl?search=$query'));
+
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
       return jsonResponse.map((data) => Contact.fromJson(data)).toList();
     } else {
+      print('Failed to load contacts. Status code: ${response.statusCode}'); 
+      print('Response body: ${response.body}'); 
       throw Exception('Failed to load contacts');
     }
   }
